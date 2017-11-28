@@ -78,3 +78,12 @@ def render_context(context_instance, context):
             yield context_instance
     else:
         yield get_context(context)
+
+
+def build_attrs(base_attrs, extra_attrs):
+    attrs = base_attrs.copy()
+
+    if extra_attrs is not None:
+        attrs.update(extra_attrs)
+
+    return attrs

@@ -19,7 +19,7 @@ from django.utils.dates import MONTHS
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
 
-from .compat import MULTIVALUE_DICT_TYPES, flatten_contexts
+from .compat import MULTIVALUE_DICT_TYPES, flatten_contexts, build_attrs
 
 
 RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
@@ -97,7 +97,7 @@ class Input(Widget):
             context['value'] = self.format_value(value)
 
         context.update(self.get_context_data())
-        context['attrs'] = self.build_attrs(attrs)
+        context['attrs'] = build_attrs(self.attrs, attrs)
 
         for key, attr in context['attrs'].items():
             if attr == 1:
@@ -159,7 +159,7 @@ class MultipleHiddenInput(HiddenInput):
         if value is None:
             value = []
 
-        final_attrs = self.build_attrs(attrs)
+        final_attrs = build_attrs(self.attrs, attrs)
         id_ = final_attrs.get('id', None)
         inputs = []
         for i, v in enumerate(value):
