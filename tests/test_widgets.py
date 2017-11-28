@@ -989,47 +989,6 @@ class WidgetRenderingTest(TestCase):
         self.assertFalse(ComboForm(data={'combo': 'bob@exmpl.com'}).is_valid())
         self.assertTrue(ComboForm(data={'combo': 'bob@ex.com'}).is_valid())
 
-    def test_split_datetime(self):
-        """Split date time widget"""
-        class SplitForm(forms.Form):
-            split = forms.SplitDateTimeField()
-
-        rendered = SplitForm().as_p()
-        self.assertHTMLEqual(rendered, """
-        <p>
-            <label for="id_split_0">Split:</label>
-            <input type="date" name="split_0" required id="id_split_0">
-            <input type="time" name="split_1" required id="id_split_1">
-        </p>""")
-
-        class SplitForm(forms.Form):
-            split = forms.SplitDateTimeField(required=False)
-
-        rendered = SplitForm().as_p()
-        self.assertHTMLEqual(rendered, """
-        <p>
-            <label for="id_split_0">Split:</label>
-            <input type="date" name="split_0" id="id_split_0">
-            <input type="time" name="split_1" id="id_split_1">
-        </p>""")
-
-        valid = {'split_0': '2011-02-06', 'split_1': '12:12'}
-        self.assertTrue(SplitForm(data=valid).is_valid())
-
-        invalid = {'split_0': '2011-02-06', 'split_1': ''}
-        self.assertFalse(SplitForm(data=invalid).is_valid())
-
-        class SplitForm(forms.Form):
-            split = forms.SplitDateTimeField(
-                widget=forms.SplitHiddenDateTimeWidget,
-            )
-
-        rendered = SplitForm().as_p()
-        self.assertHTMLEqual(rendered, """
-        <input type="hidden" name="split_0" required id="id_split_0">
-        <input type="hidden" name="split_1" required id="id_split_1">
-        """)
-
     def test_multiple_hidden(self):
         """<input type="hidden"> for fields with a list of values"""
 
@@ -1048,22 +1007,6 @@ class WidgetRenderingTest(TestCase):
         <input type="hidden" name="multi" value="heh" required id="id_multi_0">
         <input type="hidden" name="multi" value="foo" required id="id_multi_1">
         """)
-
-    def test_datetime_with_initial(self):
-        """SplitDateTimeWidget with an initial value"""
-        value = now()
-
-        class DateTimeForm(forms.Form):
-            dt = forms.DateTimeField(initial=value,
-                                     widget=forms.SplitDateTimeWidget)
-
-        rendered = DateTimeForm().as_p()
-        self.assertHTMLEqual(rendered, """
-        <p>
-            <label for="id_dt_0">Dt:</label>
-            <input type="date" name="dt_0" value="%s" id="id_dt_0">
-            <input type="time" name="dt_1" value="%s" id="id_dt_1">
-        </p>""" % (value.strftime("%Y-%m-%d"), value.strftime("%H:%M:%S")))
 
     def test_select_date_widget(self):
         """SelectDateWidget"""

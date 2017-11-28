@@ -4,11 +4,6 @@ import datetime
 
 import django
 from django import forms
-try:
-    from django.forms.utils import to_current_timezone
-except ImportError:
-    # Fall back to old module name for Django <= 1.5
-    from django.forms.util import to_current_timezone
 from django.forms.widgets import FILE_INPUT_CONTRADICTION
 from django.conf import settings
 from django.template import loader
@@ -31,9 +26,8 @@ __all__ = (
     'CheckboxInput', 'Select', 'NullBooleanSelect', 'SelectMultiple',
     'RadioSelect', 'CheckboxSelectMultiple', 'SearchInput', 'RangeInput',
     'ColorInput', 'EmailInput', 'URLInput', 'PhoneNumberInput', 'NumberInput',
-    'IPAddressInput', 'MultiWidget', 'Widget', 'SplitDateTimeWidget',
-    'SplitHiddenDateTimeWidget', 'MultipleHiddenInput', 'SelectDateWidget',
-    'SlugInput',
+    'IPAddressInput', 'MultiWidget', 'Widget', 'MultipleHiddenInput',
+    'SelectDateWidget', 'SlugInput',
 )
 
 
@@ -587,29 +581,6 @@ class MultiWidget(forms.MultiWidget):
     @property
     def is_hidden(self):
         return all(w.is_hidden for w in self.widgets)
-
-
-class SplitDateTimeWidget(MultiWidget):
-    supports_microseconds = False
-
-    def __init__(self, attrs=None, date_format=None, time_format=None):
-        widgets = (DateInput(attrs=attrs, format=date_format),
-                   TimeInput(attrs=attrs, format=time_format))
-        super(SplitDateTimeWidget, self).__init__(widgets, attrs)
-
-    def decompress(self, value):
-        if value:
-            value = to_current_timezone(value)
-            return [value.date(), value.time().replace(microsecond=0)]
-        return [None, None]
-
-
-class SplitHiddenDateTimeWidget(SplitDateTimeWidget):
-    def __init__(self, attrs=None, date_format=None, time_format=None):
-        super(SplitHiddenDateTimeWidget, self).__init__(attrs, date_format,
-                                                        time_format)
-        for widget in self.widgets:
-            widget.input_type = 'hidden'
 
 
 class SelectDateWidget(forms.Widget):
