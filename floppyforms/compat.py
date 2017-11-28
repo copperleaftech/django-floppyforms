@@ -11,11 +11,24 @@ except ImportError:
     from django.utils.datastructures import MultiValueDict
     MULTIVALUE_DICT_TYPES = (MultiValueDict,)
 
+try:
+    from django.forms.renderers import get_default_renderer
+except ImportError:
+    get_default_renderer = None
+
 
 REQUIRED_CONTEXT_ATTRIBUTES = (
     '_form_config',
     '_form_render',
 )
+
+
+if get_default_renderer is None:
+    def render_with_default_renderer(template_name, context):
+        return get_template(context, template_name).render(context)
+else:
+    def render_with_default_renderer(template_name, context):
+        return get_default_renderer().render(template_name, context.flatten())
 
 
 # We need a custom subclass of dict here in order to allow setting attributes

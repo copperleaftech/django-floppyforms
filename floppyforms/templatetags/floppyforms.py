@@ -13,8 +13,9 @@ from django.template import (Library, Node, Variable,
                              TemplateSyntaxError, VariableDoesNotExist)
 from django.template.base import token_kwargs
 from django.utils.functional import empty
+from django.utils.html import conditional_escape
 
-from ..compat import get_template
+from ..compat import get_template, render_with_default_renderer
 
 
 register = Library()
@@ -732,19 +733,17 @@ class WidgetNode(Node):
     def render(self, context):
         field = self.field.resolve(context)
 
-        if callable(getattr(field.field.widget, 'get_context', None)):
-            name = field.html_name
-            attrs = {'id': field.auto_id}
-            value = field.value()
-            widget_ctx = field.field.widget.get_context(name, value, attrs)
-            template = field.field.widget.template_name
-        else:
-            widget_ctx = {'field': field}
-            template = 'floppyforms/dummy.html'
+        if not callable(getattr(field.field.widget, 'get_context', None)):
+            return conditional_escape(field)
 
-        template = get_template(context, template)
+        name = field.html_name
+        attrs = {'id': field.auto_id}
+        value = field.value()
+        widget_ctx = field.field.widget.get_context(name, value, attrs)
+        template_name = field.field.widget.template_name
+
         context.update(widget_ctx)
-        rendered = template.render(context)
+        rendered = render_with_default_renderer(template_name, context)
         context.pop()
         return rendered
 
