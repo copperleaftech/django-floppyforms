@@ -12,7 +12,7 @@ except ImportError:
     MULTIVALUE_DICT_TYPES = (MultiValueDict,)
 
 
-REQUIRED_CONTEXT_ATTRIBTUES = (
+REQUIRED_CONTEXT_ATTRIBUTES = (
     '_form_config',
     '_form_render',
 )
@@ -65,7 +65,7 @@ def flatten_contexts(*contexts):
     for context in contexts:
         if context is not None:
             new_context.update(flatten_context(context))
-            for attr in REQUIRED_CONTEXT_ATTRIBTUES:
+            for attr in REQUIRED_CONTEXT_ATTRIBUTES:
                 if hasattr(context, attr):
                     setattr(new_context, attr, getattr(context, attr))
     return new_context
